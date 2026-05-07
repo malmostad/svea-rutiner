@@ -1,12 +1,12 @@
-# Svea rutiner
+# Rutiner i Svea
 
 
-# Skapa virtuell miljö
+## Skapa virtuell miljö
 python -m venv venv
 
-# Aktivera miljö
+## Aktivera miljö
 .\venv\Scripts\Activate.ps1
 
-# Installera paket
+## Installera paket
 pip install requests python-dotenv
 
