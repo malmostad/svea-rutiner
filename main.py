@@ -10,6 +10,7 @@ CLIENT_SECRET = os.getenv('SVEA_CLIENT_SECRET')
 TOKEN_URL = "https://staging.sveagpt.se/oauth/token"
 BASE_URL = "https://staging.sveagpt.se/api/v1"
 LOCAL_FOLDER = "./filer_att_ladda_upp"
+TARGET_FOLDER_ID = 24283
 
 def get_access_token():
     payload = {
@@ -25,7 +26,7 @@ def get_access_token():
         return None
     return None
 
-def upload_file(token, file_path):
+def upload_file(token, file_path, folder_id=None):
     file_name = os.path.basename(file_path)
     url = f"{BASE_URL}/files"
     
@@ -33,14 +34,18 @@ def upload_file(token, file_path):
         "Authorization": f"Bearer {token}",
         "Accept": "application/json"
     }
-    
+
+    data = {}
+    if folder_id:
+        data['folder_id'] = folder_id
+
     with open(file_path, 'rb') as f:
         files = [
             ('files[]', (file_name, f, 'application/pdf'))
         ]
         
-        print(f" Skickar: {file_name}...")
-        response = requests.post(url, headers=headers, files=files)
+        print(f" Skickar: {file_name} till mapp {folder_id}...")
+        response = requests.post(url, headers=headers, files=files, data=data)
         
     if response.status_code in [200, 201]:
         data = response.json()
@@ -83,7 +88,7 @@ if __name__ == "__main__":
                 print(f"Hittade {len(files_to_upload)} filer att ladda upp.\n")
                 for filename in files_to_upload:
                     full_path = os.path.join(LOCAL_FOLDER, filename)
-                    upload_file(token, full_path)
+                    upload_file(token, full_path, folder_id=TARGET_FOLDER_ID)
     else:
         print(" Autentisering misslyckades!")
         print("Kontrollera CLIENT_ID och CLIENT_SECRET i din .env-fil.")
